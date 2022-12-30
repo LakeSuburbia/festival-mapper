@@ -1,0 +1,16 @@
+<!-- display a list of festivals based on base.html django template -->
+{% extends "mapper/base.html" %}
+{% block head %}
+{% endblock %}
+{% block body %}
+{% for festival in festivals %}
+<div class="festival">
+    <h2><a href="{% url 'view_festival' festival.id %}">{{ festival.name }}</a></h2>
+    <p>{{ festival.description }}</p>
+    <p>{{ festival.location }}</p>
+    <p>{{ festival.date }}</p>
+</div>
+{% endfor %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}

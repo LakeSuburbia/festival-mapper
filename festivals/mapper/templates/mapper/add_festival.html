@@ -1,0 +1,16 @@
+<!-- Template to add a new festival -->
+{% extends "mapper/base.html" %}
+{% block head %}
+{% endblock %}
+{% block body %}
+<h1>Add a new festival</h1>
+<form action="{% url 'add_festival' %}" method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Add Festival" />
+</form>
+{% endblock %}
+{% block scripts %}
+{% endblock %}

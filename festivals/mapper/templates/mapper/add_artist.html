@@ -1,0 +1,20 @@
+<!-- Template to add an artist -->
+
+{% extends "mapper/base.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<h1>Add a new artist</h1>
+<form action="{% url 'add_artist' %}" method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Add Artist" />
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

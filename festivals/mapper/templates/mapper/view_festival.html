@@ -1,0 +1,19 @@
+<!-- detail page of a festival -->
+{% extends "mapper/base.html" %}
+{% block title %}{{ festival.name }}{% endblock %}
+{% block body %}
+    <h1>{{ festival.name }}</h1>
+    <p>{{ festival.description }}</p>
+    <p>{{ festival.location }}</p>
+    <p>{{ festival.date }}</p>
+
+    {% if festival.artists %}
+    <h2>Artists</h2>
+    <ul>
+        {% for artist in festival.artists %}
+            <li><a href="{% url 'view_artist' artist.id %}">{{ artist.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}
+{% block scripts %}{% endblock %}

@@ -1,0 +1,12 @@
+<!-- List of all artists -->
+{% extends "mapper/base.html" %}
+{% block title %}Artists{% endblock %}
+{% block body %}
+    <h1>Artists</h1>
+    <ul>
+        {% for artist in artists %}
+            <li><a href="{% url 'view_artist' artist.id %}">{{ artist.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block scripts %}{% endblock %}
