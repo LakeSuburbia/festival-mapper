@@ -1,5 +1,8 @@
 <!-- base django html template that will be used by the other templates -->
-
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -12,6 +15,40 @@
 </head>
 
 <body>
+{% block navbar %}
+
+<div class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" style="margin-left: 5%;" href="{% url 'index' %}">Festival Mapper</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <ul class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Festivals
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'list_festivals' %}">Overview Festivals</a></li>
+                        <li><a class="dropdown-item" href="{% url 'add_festival' %}">Add Festival</a></li>
+                    </ul>
+                </ul>
+                <ul class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Artists
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'list_artists' %}">Overview Artists</a></li>
+                        <li><a class="dropdown-item" href="{% url 'add_artist' %}">Add Artist</a></li>
+                    </ul>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
 {% block body %}
 {% endblock %}
 </body>

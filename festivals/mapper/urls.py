@@ -11,12 +11,12 @@ from mapper.views import (
 )
 
 urlpatterns = [
-    path("", index),
+    path("", index, name="index"),
     path("festivals/add", add_festival, name="add_festival"),
     path("artists/add", add_artist, name="add_artist"),
     path("add_artist_to_festival", add_artist_to_festival),
     path("festivals/<id>", view_festival, name="view_festival"),
     path("artists/<id>", view_artist, name="view_artist"),
-    path("festivals", list_festivals),
-    path("artists", list_artists),
+    path("festivals", list_festivals, name="list_festivals"),
+    path("artists", list_artists, name="list_artists"),
 ]
