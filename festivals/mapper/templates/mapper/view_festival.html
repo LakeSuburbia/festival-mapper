@@ -3,7 +3,6 @@
 {% block title %}{{ festival.name }}{% endblock %}
 {% block body %}
     <h1>{{ festival.name }}</h1>
-    <p>{{ festival.description }}</p>
     <p>{{ festival.location }}</p>
     <p>{{ festival.date }}</p>
 
@@ -15,5 +14,8 @@
         {% endfor %}
     </ul>
     {% endif %}
+    <button>
+        <a href="{% url 'festival__add_artists_to_festival' festival.id %}">Add Artist To Festival</a>
+    </button>
 {% endblock %}
 {% block scripts %}{% endblock %}

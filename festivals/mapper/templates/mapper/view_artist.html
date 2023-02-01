@@ -12,6 +12,9 @@
         {% endfor %}
     </ul>
     {% endif %}
+    <button>
+        <a href="{% url 'artist__add_artist_to_festivals' artist.id %}">Add Artist To Festivals</a>
+    </button>
 
 
 {% endblock %}

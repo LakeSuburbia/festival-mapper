@@ -39,15 +39,28 @@ class AddArtistForm(forms.ModelForm):
         }
 
 
-class AddArtistToFestivalForm(forms.Form):
-    class Meta:
-        model = FestivalArtist
-        fields = ["festival", "artist", "date"]
-        widgets = {
-            "date": forms.DateInput(attrs={"type": "date"}),
-        }
-        labels = {
-            "festival": "Festival",
-            "artist": "Artist",
-            "date": "Date",
-        }
+class AddMultipleArtistsToFestivalFormSet(forms.BaseFormSet):
+    def __init__(self, *args, **kwargs):
+        festival = kwargs.pop("festival", None)
+        artist = kwargs.pop("artist", None)
+
+        super(AddMultipleArtistsToFestivalFormSet, self).__init__(*args, **kwargs)
+        for form in self.forms:
+            form.fields["festival"].required = True
+            form.fields["artist"].required = True
+            form.fields["date"].required = True
+            if festival:
+                form.fields["festival"].initial = festival
+                form.fields["festival"].required = False
+                form.fields["festival"].disabled = True
+            if artist:
+                form.fields["artist"].initial = artist
+                form.fields["artist"].required = False
+                form.fields["artist"].disabled = True
+
+    def save(self, commit=True):
+        instances = []
+        for form in self.forms:
+            if form.cleaned_data:
+                instances.append(form.save(commit=commit))
+        return instances

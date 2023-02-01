@@ -1,7 +1,15 @@
 from django.shortcuts import render
 
-from mapper.forms import AddFestivalForm, AddArtistForm, AddArtistToFestivalForm
-from mapper.models import Festival, Artist
+from django.forms import modelformset_factory, widgets, Select
+
+from django.core.exceptions import ValidationError
+
+from mapper.forms import (
+    AddFestivalForm,
+    AddArtistForm,
+    AddMultipleArtistsToFestivalFormSet,
+)
+from mapper.models import Festival, Artist, FestivalArtist
 
 
 # Create your views here.
@@ -36,19 +44,71 @@ def add_artist(request):
     return render(request, "mapper/add_artist.html", {"form": form})
 
 
-def add_artist_to_festival(request):
+BulkAddArtistFormset = modelformset_factory(
+    FestivalArtist,
+    fields=("festival", "artist", "date"),
+    widgets={
+        "date": widgets.DateInput(
+            attrs={
+                "type": "date",
+            },
+        ),
+    },
+    formset=AddMultipleArtistsToFestivalFormSet,
+)
+
+
+def add_artists_to_festival(request, festival=None, artist=None):
+    if festival:
+        festival = Festival.objects.get(id=festival)
+    if artist:
+        artist = Artist.objects.get(id=artist)
+
+    data = {
+        "form-TOTAL_FORMS": "5",
+        "form-INITIAL_FORMS": "0",
+    }
+
+    messages = []
+
     if request.method == "POST":
-        form = AddArtistToFestivalForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return view_festival(request, form.cleaned_data["festival"].id)
-    form = AddArtistToFestivalForm()
-    return render(request, "mapper/add_artist_to_festival.html", {"form": form})
+        formset = BulkAddArtistFormset(request.POST, festival=festival, artist=artist)
+
+        if formset and formset.is_valid():
+            formset.save()
+            if festival:
+                return view_festival(request, festival.id)
+            if artist:
+                return view_artist(request, artist.id)
+
+        messages += formset.errors if formset else []
+        messages += formset.non_form_errors() if formset else []
+
+    return render(
+        request,
+        "mapper/add_artists_to_festival.html",
+        {
+            "formset": BulkAddArtistFormset(
+                data,
+                festival=festival,
+                artist=artist,
+            ),
+            "festival": festival,
+            "artist": artist,
+            "messages": messages,
+        },
+    )
 
 
 def view_festival(request, id):
     festival = Festival.objects.get(id=id)
-    return render(request, "mapper/view_festival.html", {"festival": festival})
+    return render(
+        request,
+        "mapper/view_festival.html",
+        {
+            "festival": festival,
+        },
+    )
 
 
 def view_artist(request, id):
