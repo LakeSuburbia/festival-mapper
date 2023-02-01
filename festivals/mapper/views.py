@@ -1,13 +1,13 @@
 from django.shortcuts import render
 
-from django.forms import modelformset_factory, widgets, Select
+from django.forms import modelformset_factory, widgets
 
-from django.core.exceptions import ValidationError
 
 from mapper.forms import (
     AddFestivalForm,
     AddArtistForm,
     AddMultipleArtistsToFestivalFormSet,
+    AddArtistToFestivalForm,
 )
 from mapper.models import Festival, Artist, FestivalArtist
 
@@ -54,6 +54,7 @@ BulkAddArtistFormset = modelformset_factory(
             },
         ),
     },
+    form=AddArtistToFestivalForm,
     formset=AddMultipleArtistsToFestivalFormSet,
 )
 

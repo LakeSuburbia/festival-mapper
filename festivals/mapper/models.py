@@ -10,6 +10,8 @@ class FestivalManager(models.Manager):
     def create(
         self, name: str, start_date: dt.date, end_date: dt.date, location: str, **kwargs
     ) -> Festival:
+        if start_date > end_date:
+            raise ValueError("start_date must be before end_date")
         festival = self.create(
             name=name,
             start_date=start_date,
@@ -149,7 +151,10 @@ class FestivalArtistManager(models.Manager):
     def create(
         self, festival: Festival, artist: Artist, date: dt.date
     ) -> FestivalArtist:
-        obj = super(FestivalArtistManager, self).create(
+        if not festival.start_date <= date <= festival.end_date:
+            raise ValueError("Date is not in festival range")
+
+        obj = super(FestivalArtistManager, self).get_or_create(
             festival=festival, artist=artist, date=date
         )
         obj.save()
@@ -162,6 +167,10 @@ class FestivalArtist(models.Model):
     date = models.DateField()
     deleted = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ("festival", "artist", "date")
+        ordering = ["date"]
+
     def __str__(self):
         return f"{self.festival} - {self.artist} - {self.date}"
 
@@ -172,3 +181,15 @@ class FestivalArtist(models.Model):
     def restore(self, *args, **kwargs):
         self.deleted = False
         self.save()
+
+    def save(self, *args, **kwargs):
+        if not self.festival.start_date <= self.date <= self.festival.end_date:
+            raise ValueError("Date is not in festival range")
+        if not self.artist.is_available(self.date):
+            raise ValueError("Artist is not available on this date")
+        if not self.pk:
+            if FestivalArtist.objects.filter(
+                festival=self.festival, artist=self.artist, date=self.date
+            ).exists():
+                raise ValueError("Artist is already playing on this date")
+        super(FestivalArtist, self).save(*args, **kwargs)

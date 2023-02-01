@@ -1,6 +1,8 @@
 from django import forms
 from mapper.models import Festival, Artist, FestivalArtist
 
+from django.core.exceptions import ValidationError
+
 
 class AddFestivalForm(forms.ModelForm):
     class Meta:
@@ -37,6 +39,58 @@ class AddArtistForm(forms.ModelForm):
         labels = {
             "name": "Artist Name",
         }
+
+
+class AddArtistToFestivalForm(forms.ModelForm):
+    class Meta:
+        model = FestivalArtist
+        fields = ["festival", "artist", "date"]
+        widgets = {
+            "date": forms.DateInput(attrs={"type": "date"}),
+        }
+        labels = {
+            "festival": "Festival",
+            "artist": "Artist",
+            "date": "Date",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(AddArtistToFestivalForm, self).__init__(*args, **kwargs)
+
+        self.fields["festival"].required = True
+        self.fields["artist"].required = True
+        self.fields["date"].required = True
+        return super(AddArtistToFestivalForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(AddArtistToFestivalForm, self).clean()
+        festival = cleaned_data.get("festival")
+        artist = cleaned_data.get("artist")
+        date = cleaned_data.get("date")
+
+        if festival and artist and date:
+            if FestivalArtist.objects.filter(
+                festival=festival, artist=artist, date=date
+            ).exists():
+                raise ValidationError("Artist already added to festival on that date.")
+
+            if FestivalArtist.objects.filter(festival=festival, artist=artist).exists():
+                raise ValidationError(
+                    "Artist already added to festival on a different date."
+                )
+
+            if not artist.is_available(date):
+                raise ValidationError("Artist already plays another show on that date.")
+
+            if festival.start_date > date or festival.end_date < date:
+                raise ValidationError(
+                    "Date is outside of festival dates."
+                    "The festival dates are: {} - {}".format(
+                        festival.start_date, festival.end_date
+                    ),
+                )
+
+        return cleaned_data
 
 
 class AddMultipleArtistsToFestivalFormSet(forms.BaseFormSet):
